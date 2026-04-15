@@ -75,7 +75,7 @@ if ('Genres', 'Christmas  2') in catalog_mapping:
                 catalog_mapping[('Genres', 'Christmas')].append(item)
     del catalog_mapping[('Genres', 'Christmas  2')]
 
-# Generate output
+# Generate output - hierarchical structure with folders array
 output = []
 
 # Map main group IDs to their info
@@ -87,18 +87,8 @@ for group_id, group_info in main_groups.items():
     # Get image URL for the main category
     cover_url = image_urls.get(category_name, "")
     
-    # Create main category object
-    main_category = {
-        "id": str(uuid.uuid4()),
-        "title": category_name,
-        "_coverMode": "image",
-        "coverImageUrl": cover_url,
-        "tileShape": poster_type,
-        "catalogSources": []
-    }
-    output.append(main_category)
-    
-    # Create objects for each subfolder
+    # Create folders array for subgroups
+    folders = []
     for subgroup_name in subgroup_names:
         # Get image URL for subgroup
         sub_cover_url = image_urls.get(subgroup_name, "")
@@ -122,7 +112,19 @@ for group_id, group_info in main_groups.items():
             "tileShape": poster_type,
             "catalogSources": catalog_sources
         }
-        output.append(subfolder_obj)
+        folders.append(subfolder_obj)
+    
+    # Create main category object with folders array
+    main_category = {
+        "id": str(uuid.uuid4()),
+        "title": category_name,
+        "_coverMode": "image",
+        "coverImageUrl": cover_url,
+        "tileShape": poster_type,
+        "catalogSources": [],
+        "folders": folders
+    }
+    output.append(main_category)
 
 # Write output
 with open('/workspace/media-library-layout.json', 'w') as f:
